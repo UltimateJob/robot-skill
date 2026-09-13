@@ -40,3 +40,7 @@ Start with Fake/simulation tests. A Skill may cause physical motion when connect
 ## License
 
 Copyright 2026 InsightOS. First-party code: [Apache-2.0](LICENSE). See [NOTICE](NOTICE) and [license scope](LICENSE_SCOPE.md) for third-party components and assets.
+
+## Reproducible platform builds
+
+See [glibc, musl and macOS build instructions](README.build.md) for pinned source revisions, exact scripts, tool requirements, local commands, CI reproduction and platform support boundaries.
