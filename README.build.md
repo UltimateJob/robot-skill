@@ -8,7 +8,7 @@ To reconstruct another published release, read its `release.json` and select
 both `source_commit` and `build_recipe_commit`; a source tag alone may predate
 the CI scripts. This recipe reproduces the build steps, not historical archive bytes.
 
-Prerequisites: uv 0.12.12, Git and Python 3; component scripts select Python 3.13. Use a fresh virtual environment for each platform.
+Prerequisites: uv 0.12.12, Git, Make and Python 3; component scripts select Python 3.13. Use a fresh virtual environment for each platform.
 
 The release scripts expect **two sibling checkouts**, `automation/` for build
 scripts and `source/` for the component. Run these commands from a fresh working
