@@ -131,7 +131,7 @@ class Worker:
             self.peer.send_error(message.request_id, -32000, "Worker 尚未由 Pilot 初始化")
             return
         with self._execution_lock:
-            if self.context is not None:
+            if self.context is not None and self.context.status not in {"completed", "failed"}:
                 self.peer.send_error(message.request_id, -32001, "Worker 已有活动 Execution")
                 return
             params = message.params
@@ -165,10 +165,9 @@ class Worker:
             )
         except BaseException as exc:
             self.peer.send_error(message.request_id, -32010, f"Skill Worker 异常: {exc}")
-        finally:
-            with self._execution_lock:
-                if self.context is not None and self.context.status in {"completed", "failed"}:
-                    self.context = None
+        # skill.run 的 failed 只说明业务执行失败，Pilot 仍可能需要 on_stop
+        # 来确认物理保持。保留本次上下文直到 Pilot 清理 Worker 或启动下一次
+        # 执行，避免失败刚返回就丢失停止入口；上下文不触发动作或自动重试。
 
     async def _run_until_terminal(self, context: RpcSkillContext) -> None:
         if self.run_function is None:

@@ -22,6 +22,7 @@ Pilot 后面的能力实现负责。
 
 from __future__ import annotations
 
+import re
 from typing import TypeVar
 
 from pydantic import BaseModel, ValidationError
@@ -766,7 +767,14 @@ def _missing_preflight_contact_tools(
         "hook_force_low",
         "clamp_force_low",
     )
-    reasons = message.rsplit("禁止开始抬升: ", 1)[-1].split("; ")
+    # Ability 用 ", " 拼接多条 blocking reason（manipulator_motion.py 的
+    # LiftHeldObject 预检），只按 "; " 拆分会把两条原因当成一个 token，
+    # 白名单校验必然失败，单侧重入位恢复会因此永不触发。
+    reasons = [
+        item.strip()
+        for item in re.split(r"[,;]\s*", message.rsplit("禁止开始抬升: ", 1)[-1])
+        if item.strip()
+    ]
     recoverable = {f"{ref}:{marker}" for ref in tool_refs for marker in missing_markers}
     if not reasons or any(reason not in recoverable for reason in reasons):
         return []

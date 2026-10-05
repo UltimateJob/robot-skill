@@ -22,7 +22,7 @@ name = "semantic-robot-skill-sdk"
 version = "0.1.0.dev0"
 description = "Semantic Robot Skill 的 Worker Runtime 与 Python SDK"
 requires-python = ">=3.11"
-license = { text = "Apache-2.0" }
+license = { text = "Proprietary" }
 dependencies = ["pydantic>=2.8,<3"]
 
 [tool.setuptools.packages.find]

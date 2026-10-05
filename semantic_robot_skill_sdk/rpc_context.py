@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime
 from typing import Any, AsyncIterator, TypeVar
 
@@ -59,8 +60,14 @@ class RpcActionHandle:
                 self._context._feedback[self._key] = feedback.sequence
                 self._context._remember(feedback.observations)
                 yield feedback
-            if bool(value.get("terminal")) or not items:
+            if bool(value.get("terminal")):
                 return
+            if not items:
+                # 暂无反馈不等于动作结束，例如模型仍在推理。保持流开放，
+                # 否则 Skill 会转入阻塞的 result()，丢失期间的验收与安全检查。
+                # 等待让出事件循环；停止通知仍可通过原有 RPC 通道到达。
+                self._context.check_cancelled()
+                await asyncio.sleep(0.05)
 
     async def stop(self, reason: str) -> ActionResult:
         value = self._context._call(
